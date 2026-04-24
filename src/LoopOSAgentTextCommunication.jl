@@ -3,10 +3,9 @@ module LoopOSAgentTextCommunication
 using ZMQ
 using LoopOS: InputPeripheral, OutputPeripheral, listen, @whiletrue
 
-const CONTEXT = ZMQ.context()
-const DEALERSOCKET = Socket(CONTEXT, DEALER)
+const DEALERSOCKET = Socket(DEALER)
 setproperty!(DEALERSOCKET, :routing_id, Sys.username())
-const SUBSOCKET = Socket(CONTEXT, SUB)
+const SUBSOCKET = Socket(SUB)
 
 function init(group, routerlocation, publocation)
     connect(DEALERSOCKET, routerlocation)
