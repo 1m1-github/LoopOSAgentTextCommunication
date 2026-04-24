@@ -4,11 +4,11 @@ using ZMQ
 using LoopOS: InputPeripheral, OutputPeripheral, listen, @whiletrue
 
 const DEALERSOCKET = Ref{Socket}()
-setproperty!(DEALERSOCKET, :routing_id, Sys.username())
 const SUBSOCKET = Ref{Socket}()
 
 function init(group, routerlocation, publocation)
     DEALERSOCKET[] = Socket(DEALER)
+    setproperty!(DEALERSOCKET[], :routing_id, Sys.username())
     SUBSOCKET[] = Socket(SUB)
     connect(DEALERSOCKET[], routerlocation)
     connect(SUBSOCKET[], publocation)
