@@ -3,17 +3,19 @@ module LoopOSAgentTextCommunication
 using ZMQ
 using LoopOS: InputPeripheral, OutputPeripheral, listen, @whiletrue
 
-const DEALERSOCKET = Socket(DEALER)
+const DEALERSOCKET = Ref{Socket}()
 setproperty!(DEALERSOCKET, :routing_id, Sys.username())
-const SUBSOCKET = Socket(SUB)
+const SUBSOCKET = Ref{Socket}()
 
 function init(group, routerlocation, publocation)
-    connect(DEALERSOCKET, routerlocation)
-    connect(SUBSOCKET, publocation)
-    subscribe(SUBSOCKET, group)
-    subscribe(SUBSOCKET, "∀")
+    DEALERSOCKET[] = Socket(DEALER)
+    SUBSOCKET[] = Socket(SUB)
+    connect(DEALERSOCKET[], routerlocation)
+    connect(SUBSOCKET[], publocation)
+    subscribe(SUBSOCKET[], group)
+    subscribe(SUBSOCKET[], "∀")
     listen(RECEIVEMESSAGE)
-    @async @whiletrue receive(DEALERSOCKET), @async @whiletrue receive(SUBSOCKET)
+    @async @whiletrue receive(DEALERSOCKET[]), @async @whiletrue receive(SUBSOCKET[])
 end
 
 function receive(socket)
@@ -25,7 +27,7 @@ function receive(socket)
 end
 
 import Base: take!, put!
-send(message, to) = send_multipart(DEALERSOCKET, [to, getproperty(DEALERSOCKET, :routing_id), message])
+send(message, to) = ZMQ.send_multipart(DEALERSOCKET[], [to, getproperty(DEALERSOCKET[], :routing_id), message])
 struct DirectMessage <: OutputPeripheral end
 put!(::DirectMessage, message::String, to::String="Dona") = send(message, to)
 struct GroupMessage <: OutputPeripheral end
