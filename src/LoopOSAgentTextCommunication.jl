@@ -6,7 +6,7 @@ using LoopOS: InputPeripheral, OutputPeripheral, listen, @whiletrue
 const DEALERSOCKET = Ref{Socket}()
 const SUBSOCKET = Ref{Socket}()
 
-function init(group, routerlocation, publocation)
+function start(group, routerlocation, publocation)
     DEALERSOCKET[] = Socket(DEALER)
     setproperty!(DEALERSOCKET[], :routing_id, Sys.username())
     SUBSOCKET[] = Socket(SUB)
